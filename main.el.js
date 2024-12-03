@@ -1,12 +1,13 @@
 import { css, html, LitElement } from "https://esm.run/lit@^3";
 import { styleMap } from "https://esm.run/lit@^3/directives/style-map.js";
+import { createRef, ref } from "https://esm.run/lit@^3/directives/ref.js";
 import { detector } from "./detector.util.js";
 
 export class AppMain extends LitElement {
   static styles = css`
     .container {
       margin: 40px auto;
-      width: max(50vw, 400px);
+      width: min(90vw, 1400px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -56,19 +57,27 @@ export class AppMain extends LitElement {
       margin-left: -2px;
       padding: 1px;
     }
+
+    .analysing-dialog {
+      position: fixed;
+      margin: 0;
+      top: 50vh;
+      left: 50vw;
+      transform: translate(-50%, -50%);
+    }
   `;
 
   static properties = {
-    status: { type: String },
     imageURL: { type: String },
     detectorOutput: { type: Object },
+    inputRef: { type: Object },
   };
 
   constructor() {
     super();
-    this.status = "";
     this.imageURL = "";
     this.detectorOutput;
+    this.analysingDialogRef = createRef();
   }
 
   render() {
@@ -88,7 +97,9 @@ export class AppMain extends LitElement {
           <img src=${this.imageURL} />
           ${this.#renderBoxes()}
         </div>
-        <p id="status">${this.status}</p>
+        <dialog ${ref(this.analysingDialogRef)} class="analysing-dialog">
+          Analysing...
+        </dialog>
       </main>
     `;
   }
@@ -102,12 +113,12 @@ export class AppMain extends LitElement {
   };
 
   async #detect(imgSrc) {
-    this.status = "Analysing...";
+    this.analysingDialogRef.value?.showModal();
     this.detectorOutput = await detector(imgSrc, {
       threshold: 0.5,
       percentage: true,
     });
-    this.status = "";
+    this.analysingDialogRef.value?.close();
   }
 
   #renderBoxes() {

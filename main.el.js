@@ -83,6 +83,7 @@ export class AppMain extends LitElement {
           />
           Load image
         </label>
+        <div><i>Using ${navigator.gpu ? "GPU" : "CPU"}</i></div>
         <div id="image-container">
           <img src=${this.imageURL} />
           ${this.#renderBoxes()}

@@ -109,6 +109,7 @@ export class AppMain extends LitElement {
     if (!file) {
       return;
     }
+    this.detectorOutput = void 0;
     this.#detect((this.imageURL = URL.createObjectURL(file)));
   };
 
